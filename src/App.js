@@ -1,26 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import InputForm from './components/InputForm/InputForm';
+import Filter from './components/Filter/Filter';
+import Phonebook from './components/Phonebook/Phonebook';
+import Container from './components/Container/Container';
+
+import { getIsLoading } from './redux/phonebook/phonebook-selectors';
+import * as contactsOperations from './redux/phonebook/phonebook-operations';
+
+class App extends Component {
+  componentDidMount() {
+    this.props.fetchContacts();
+  }
+  render() {
+    return (
+      <>
+        <Container title="Phonebook">
+          <InputForm />
+        </Container>
+        <Container title="Contacts">
+          <Filter />
+          {this.props.isLoadingContacts && <h2> Loading contacts...</h2>}
+          <Phonebook />
+        </Container>
+      </>
+    );
+  }
 }
 
-export default App;
+const mapStateToProps = state => ({
+  isLoadingContacts: getIsLoading(state),
+});
+
+const mapDispatchToProps = dispatch => ({
+  fetchContacts: () => dispatch(contactsOperations.fetchContacts()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
